@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class App extends StatefulWidget
 class MainScreen extends State<App>
 {
   String tempText = "";
+  String tempText2 = "";
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,9 +49,10 @@ class MainScreen extends State<App>
         home: Scaffold(
       appBar: AppBar(centerTitle: true, title: Text('TimeKeeper')),
       body: ListView.builder(itemBuilder: (BuildContext context, int index) {
-        return Dismissible(key: UniqueKey(), onDismissed: (DismissDirection direction) {
+        return Dismissible(key: UniqueKey(), movementDuration: Duration(milliseconds: 500), onDismissed: (DismissDirection direction) {
           debugPrint("deleted " + index.toString());
           box.deleteAt(index);
+          data.removeAt(index);
         }, child: Card(
             elevation: 0,
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 0),
@@ -81,7 +84,7 @@ class MainScreen extends State<App>
       onPressed: () {
         Navigator.of(context).pop();
         setState(() {
-          TaskData taskData = TaskData(tempText, 5);
+          TaskData taskData = TaskData(tempText, int.parse(tempText2));
           box.add(taskData);
           data.add(taskData);
         });
@@ -93,9 +96,12 @@ class MainScreen extends State<App>
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text("My title"),
-      content: Container(height: 80,child: Column(children: [Text("This is my message."),
+      content: Container(height: 120,child: Column(children: [Text("This is my message."),
         TextField( onChanged: (String text) {
           tempText = text;
+        },),
+        TextField(keyboardType: TextInputType.number, onChanged: (String text) {
+          tempText2 = text;
         },)
       ])),
       actions: [
